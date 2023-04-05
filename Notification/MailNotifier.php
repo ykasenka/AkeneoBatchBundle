@@ -4,6 +4,7 @@ namespace Akeneo\Tool\Bundle\BatchBundle\Notification;
 
 use Akeneo\Tool\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
 use Akeneo\Tool\Component\Batch\Model\JobExecution;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -55,8 +56,8 @@ class MailNotifier implements Notifier
     public function __construct(
         BatchLogHandler $logger,
         TokenStorageInterface $tokenStorage,
-        \Twig_Environment $twig,
-        \Swift_Mailer $mailer,
+        \Twig\Environment $twig,
+        MailerInterface $mailer,
         $senderEmail
     ) {
         $this->logger = $logger;
