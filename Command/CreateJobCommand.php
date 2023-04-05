@@ -8,10 +8,12 @@ use Akeneo\Tool\Component\Batch\Job\JobParametersFactory;
 use Akeneo\Tool\Component\Batch\Job\JobParametersValidator;
 use Akeneo\Tool\Component\Batch\Job\JobRegistry;
 use Akeneo\Tool\Component\StorageUtils\Saver\SaverInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -22,8 +24,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class CreateJobCommand extends ContainerAwareCommand
+class CreateJobCommand extends Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     const EXIT_SUCCESS_CODE = 0;
     const EXIT_ERROR_CODE = 1;
 
@@ -116,7 +120,7 @@ class CreateJobCommand extends ContainerAwareCommand
      */
     protected function getValidator()
     {
-        return $this->getContainer()->get('validator');
+        return $this->container->get('validator');
     }
 
     /**
@@ -124,7 +128,7 @@ class CreateJobCommand extends ContainerAwareCommand
      */
     protected function getJobParametersValidator()
     {
-        return $this->getContainer()->get('akeneo_batch.job.job_parameters_validator');
+        return $this->container->get('akeneo_batch.job.job_parameters_validator');
     }
 
     /**
@@ -132,7 +136,7 @@ class CreateJobCommand extends ContainerAwareCommand
      */
     protected function getJobParametersFactory()
     {
-        return $this->getContainer()->get('akeneo_batch.job_parameters_factory');
+        return $this->container->get('akeneo_batch.job_parameters_factory');
     }
 
     /**
@@ -140,7 +144,7 @@ class CreateJobCommand extends ContainerAwareCommand
      */
     protected function getJobInstanceFactory()
     {
-        return $this->getContainer()->get('akeneo_batch.job_instance_factory');
+        return $this->container->get('akeneo_batch.job_instance_factory');
     }
 
     /**
@@ -148,7 +152,7 @@ class CreateJobCommand extends ContainerAwareCommand
      */
     protected function getJobInstanceSaver()
     {
-        return $this->getContainer()->get('akeneo_batch.saver.job_instance');
+        return $this->container->get('akeneo_batch.saver.job_instance');
     }
 
     /**
@@ -156,7 +160,7 @@ class CreateJobCommand extends ContainerAwareCommand
      */
     protected function getJobRegistry()
     {
-        return $this->getContainer()->get('akeneo_batch.job.job_registry');
+        return $this->container->get('akeneo_batch.job.job_registry');
     }
 
     /**

@@ -15,11 +15,13 @@ use Akeneo\Tool\Component\Batch\Model\JobInstance;
 use Akeneo\Tool\Component\Batch\Model\StepExecution;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -31,8 +33,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * @copyright 2013 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/MIT MIT
  */
-class BatchCommand extends ContainerAwareCommand
+class BatchCommand extends Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     const EXIT_SUCCESS_CODE = 0;
     const EXIT_ERROR_CODE = 1;
     const EXIT_WARNING_CODE = 2;
@@ -84,12 +88,12 @@ class BatchCommand extends ContainerAwareCommand
         $noLog = $input->getOption('no-log');
 
         if (!$noLog) {
-            $logger = $this->getContainer()->get('monolog.logger.batch');
+            $logger = $this->container->get('monolog.logger.batch');
             $logger->pushHandler(new ConsoleHandler($output));
         }
 
         $code = $input->getArgument('code');
-        $jobInstanceClass = $this->getContainer()->getParameter('akeneo_batch.entity.job_instance.class');
+        $jobInstanceClass = $this->container->getParameter('akeneo_batch.entity.job_instance.class');
         $jobInstance = $this->getJobManager()->getRepository($jobInstanceClass)->findOneBy(['code' => $code]);
 
         if (null === $jobInstance) {
@@ -130,7 +134,7 @@ class BatchCommand extends ContainerAwareCommand
                 $job->getJobRepository()->updateJobExecution($jobExecution);
             }
         } else {
-            $jobExecutionClass = $this->getContainer()->getParameter('akeneo_batch.entity.job_execution.class');
+            $jobExecutionClass = $this->container->getParameter('akeneo_batch.entity.job_execution.class');
             $jobExecution = $this->getJobManager()->getRepository($jobExecutionClass)->find($executionId);
             if (!$jobExecution) {
                 throw new \InvalidArgumentException(sprintf('Could not find job execution "%s".', $executionId));
@@ -149,7 +153,7 @@ class BatchCommand extends ContainerAwareCommand
         $job->getJobRepository()->updateJobExecution($jobExecution);
 
         $this
-            ->getContainer()
+            ->container
             ->get('akeneo_batch.logger.batch_log_handler')
             ->setSubDirectory($jobExecution->getId());
 
@@ -241,7 +245,7 @@ class BatchCommand extends ContainerAwareCommand
      */
     protected function getJobManager(): EntityManagerInterface
     {
-        return $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager();
+        return $this->container->get('akeneo_batch.job_repository')->getJobManager();
     }
 
     /**
@@ -249,7 +253,7 @@ class BatchCommand extends ContainerAwareCommand
      */
     protected function getDefaultEntityManager(): EntityManagerInterface
     {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return $this->container->get('doctrine')->getManager();
     }
 
     /**
@@ -257,7 +261,7 @@ class BatchCommand extends ContainerAwareCommand
      */
     protected function getValidator(): ValidatorInterface
     {
-        return $this->getContainer()->get('validator');
+        return $this->container->get('validator');
     }
 
     /**
@@ -265,7 +269,7 @@ class BatchCommand extends ContainerAwareCommand
      */
     protected function getMailNotifier(): MailNotifier
     {
-        return $this->getContainer()->get('akeneo_batch.mail_notifier');
+        return $this->container->get('akeneo_batch.mail_notifier');
     }
 
     /**
@@ -273,7 +277,7 @@ class BatchCommand extends ContainerAwareCommand
      */
     protected function getJobRegistry(): JobRegistry
     {
-        return $this->getContainer()->get('akeneo_batch.job.job_registry');
+        return $this->container->get('akeneo_batch.job.job_registry');
     }
 
     /**
@@ -281,7 +285,7 @@ class BatchCommand extends ContainerAwareCommand
      */
     protected function getJobParametersFactory(): JobParametersFactory
     {
-        return $this->getContainer()->get('akeneo_batch.job_parameters_factory');
+        return $this->container->get('akeneo_batch.job_parameters_factory');
     }
 
     /**
@@ -289,7 +293,7 @@ class BatchCommand extends ContainerAwareCommand
      */
     protected function getJobParametersValidator(): JobParametersValidator
     {
-        return $this->getContainer()->get('akeneo_batch.job.job_parameters_validator');
+        return $this->container->get('akeneo_batch.job.job_parameters_validator');
     }
 
     /**

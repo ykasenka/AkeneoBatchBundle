@@ -32,7 +32,7 @@ class BatchLogHandler extends StreamHandler
         $bubble = true,
         $filePermission = null,
         $useLocking = false,
-        $logDir
+        $logDir = null
     ) {
         $this->level = $level;
         $this->bubble = $bubble;
@@ -83,7 +83,7 @@ class BatchLogHandler extends StreamHandler
     /**
      * {@inheritdoc}
      */
-    public function write(array $record)
+    protected function write(array $record): void
     {
         if (null === $this->url) {
             $this->url = $this->getRealPath($this->generateLogFilename());
