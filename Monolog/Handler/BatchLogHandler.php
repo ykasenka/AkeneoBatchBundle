@@ -32,7 +32,7 @@ class BatchLogHandler extends StreamHandler
         $bubble = true,
         $filePermission = null,
         $useLocking = false,
-        $logDir
+        $logDir = null
     ) {
         $this->level = $level;
         $this->bubble = $bubble;
